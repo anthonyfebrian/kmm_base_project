@@ -5,13 +5,13 @@ plugins {
 
 android {
     namespace = "com.rariki.kmmbaseproject.android"
-    compileSdk = 33
+    compileSdk = AndroidAppConfig.compileSdk
     defaultConfig {
         applicationId = "com.rariki.kmmbaseproject.android"
-        minSdk = 24
-        targetSdk = 33
-        versionCode = 1
-        versionName = "1.0"
+        minSdk = AndroidAppConfig.minSdk
+        targetSdk = AndroidAppConfig.targetSdk
+        versionCode = AndroidAppConfig.versionCode
+        versionName = AndroidAppConfig.versionName
     }
     buildFeatures {
         compose = true
