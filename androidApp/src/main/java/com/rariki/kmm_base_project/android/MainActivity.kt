@@ -10,12 +10,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.rariki.kmm_base_project.Greeting
+import com.rariki.kmm_base_project.ui.MyTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MyApplicationTheme {
+            MyTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                 ) {
@@ -34,7 +35,7 @@ fun GreetingView(text: String) {
 @Preview
 @Composable
 fun DefaultPreview() {
-    MyApplicationTheme {
+    MyTheme {
         GreetingView("Hello, Android!")
     }
 }
