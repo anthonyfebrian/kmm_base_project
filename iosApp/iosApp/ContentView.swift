@@ -18,10 +18,11 @@ struct ContentView: View {
 
 extension ContentView {
     class ViewModel: ObservableObject {
+        let sampleApi = IosKoinHelper().sampleApi
         @Published var text = "Loading..."
         @Published var list:[RocketLaunch] = []
         init() {
-            SampleApi()
+            sampleApi
                 .getAllLaunches { list, error in
                     self.list = list ?? []
                 }

@@ -20,6 +20,7 @@ import com.rariki.kmm_base_project.Greeting
 import com.rariki.kmm_base_project.core.network.sample.RocketLaunch
 import com.rariki.kmm_base_project.core.network.sample.SampleApi
 import com.rariki.kmm_base_project.ui.MyTheme
+import org.koin.compose.koinInject
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,6 +30,7 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                 ) {
+                    val sampleApi = koinInject<SampleApi>()
                     var list by remember { mutableStateOf<List<RocketLaunch>>(listOf()) }
                     if(list.isEmpty()) {
                         Text(text = "Empty")
@@ -41,7 +43,7 @@ class MainActivity : ComponentActivity() {
                     }
 
                     LaunchedEffect(true) {
-                        list = SampleApi().getAllLaunches()
+                        list = sampleApi.getAllLaunches()
                     }
                 }
             }
