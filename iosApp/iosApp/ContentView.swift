@@ -2,12 +2,28 @@ import SwiftUI
 import shared
 
 struct ContentView: View {
-	let greet = Greeting()
-    let greet2 = Greeting2()
+    @ObservedObject private(set) var vm: ViewModel = ViewModel()
 
 	var body: some View {
-        Text("\(greet2.say) ....... \(greet.greet())")
+        Text(vm.text)
 	}
+}
+
+extension ContentView {
+    class ViewModel: ObservableObject {
+        @Published var text = "Loading..."
+        init() {
+            Greeting().textOnline { greeting, error in
+                DispatchQueue.main.async {
+                    if let greeting = greeting {
+                        self.text = greeting
+                    } else {
+                        self.text = error?.localizedDescription ?? "error"
+                    }
+                }
+            }
+        }
+    }
 }
 
 struct ContentView_Previews: PreviewProvider {
