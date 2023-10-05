@@ -5,14 +5,26 @@ struct ContentView: View {
     @ObservedObject private(set) var vm: ViewModel = ViewModel()
 
 	var body: some View {
-        Text(vm.text)
+        if(vm.list.isEmpty) {
+            Text("Empty")
+        }
+        
+        List(vm.list, id:\.self) {
+            Text($0.missionName)
+        }
+        
 	}
 }
 
 extension ContentView {
     class ViewModel: ObservableObject {
         @Published var text = "Loading..."
+        @Published var list:[RocketLaunch] = []
         init() {
+            SampleApi()
+                .getAllLaunches { list, error in
+                    self.list = list ?? []
+                }
             Greeting().textOnline { greeting, error in
                 DispatchQueue.main.async {
                     if let greeting = greeting {
