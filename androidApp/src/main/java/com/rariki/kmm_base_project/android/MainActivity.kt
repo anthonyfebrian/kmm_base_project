@@ -19,6 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.rariki.kmm_base_project.core.network.ApiResponse
 import com.rariki.kmm_base_project.core.network.sample.RocketLaunch
 import com.rariki.kmm_base_project.core.network.sample.SampleApi
 import com.rariki.kmm_base_project.ui.MyTheme
@@ -36,25 +37,42 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier.fillMaxSize(),
                         ) {
                             val sampleApi = koinInject<SampleApi>()
-                            var list by remember { mutableStateOf<List<RocketLaunch>>(listOf()) }
-                            if (list.isEmpty()) {
-                                Text(text = "Empty")
+                            var apiResponse:ApiResponse<List<RocketLaunch>>? by remember {
+                                mutableStateOf(null)
                             }
 
-                            LazyColumn {
-                                items(list) {
-                                    Text(text = it.missionName)
-                                }
-                            }
+                            ResultView(apiResponse = apiResponse)
 
                             LaunchedEffect(true) {
-                                list = sampleApi.getAllLaunches()
+                                apiResponse = sampleApi.safeGetAllLaunches()
                             }
                         }
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+fun ResultView(apiResponse: ApiResponse<List<RocketLaunch>>?) {
+    when(apiResponse) {
+        is ApiResponse.Error.GenericError -> Text("Exception ${apiResponse.exception?.message}")
+        is ApiResponse.Error.HttpError -> Text("Error HttpError ${apiResponse.errorMessage}")
+        is ApiResponse.Error.SerializationError -> Text("Error Serial")
+        is ApiResponse.Success -> {
+            val list = apiResponse.body
+
+            if (list.isEmpty()) {
+                Text(text = "Empty")
+            }
+            LazyColumn {
+                items(list) {
+                    Text(text = it.missionName)
+                }
+            }
+        }
+        null -> Text("Loading")
     }
 }
 
