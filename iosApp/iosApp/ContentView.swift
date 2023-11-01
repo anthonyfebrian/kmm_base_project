@@ -5,7 +5,7 @@ struct ContentView: View {
     @ObservedObject private(set) var vm: ViewModel = ViewModel()
 
 	var body: some View {
-        if(vm.list.isEmpty) {
+        if(self.vm.list.isEmpty) {
             Text("Empty")
         }
         
