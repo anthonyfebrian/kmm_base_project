@@ -3,12 +3,16 @@ package com.rariki.kmm_base_project.core.network
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.ClientRequestException
+import io.ktor.client.plugins.DefaultRequest
+import io.ktor.client.plugins.HttpSend
 import io.ktor.client.plugins.ResponseException
 import io.ktor.client.plugins.ServerResponseException
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.plugins.plugin
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.request
+import io.ktor.http.HttpMethod
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
@@ -16,6 +20,7 @@ import kotlinx.serialization.json.Json
 object ApiConfig {
 
     val httpClient = HttpClient {
+
         defaultRequest {
             url("https://api.spacexdata.com/v5/")
         }
@@ -27,8 +32,21 @@ object ApiConfig {
                 }
             )
         }
+        install(DefaultRequest) {
+            request {
+                this.body
+            }
+        }
 
         expectSuccess = true
+    }.apply {
+        plugin(HttpSend).intercept { request ->
+
+            if (request.method == HttpMethod.Post) {
+                //modify here if want change request body
+            }
+            execute(request)
+        }
     }
 }
 
