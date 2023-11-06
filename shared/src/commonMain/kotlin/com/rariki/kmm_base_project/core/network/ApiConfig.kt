@@ -3,6 +3,7 @@ package com.rariki.kmm_base_project.core.network
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.ClientRequestException
+import io.ktor.client.plugins.ResponseException
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.HttpRequestBuilder
@@ -41,11 +42,18 @@ suspend inline fun <reified T, reified E> HttpClient.safeRequest(
 
         ApiResponse.Error.HttpError(
             code = response.status.value,
-            errorBody = response.body(),
+            errorBody = exception.errorBody(),
             errorMessage = exception.message,
         )
     } catch (e: SerializationException) {
         ApiResponse.Error.SerializationError(e.message)
     } catch (e: Exception) {
         ApiResponse.Error.GenericError(e)
+    }
+
+suspend inline fun <reified E> ResponseException.errorBody(): E? =
+    try {
+        response.body()
+    } catch (e: SerializationException) {
+        null
     }
