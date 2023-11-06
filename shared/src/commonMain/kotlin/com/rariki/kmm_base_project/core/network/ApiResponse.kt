@@ -1,21 +1,21 @@
 package com.rariki.kmm_base_project.core.network
 
-sealed class ApiResponse<out T> {
+sealed class ApiResponse<out T, out E> {
 
-    data class Success<T>(val body: T) : ApiResponse<T>()
+    data class Success<T>(val body: T) : ApiResponse<T, Nothing>()
 
-    sealed class Error:ApiResponse<Nothing>() {
+    sealed class Error<E> : ApiResponse<Nothing, E>() {
         /**
          * Represents server errors.
          * @param code HTTP Status code
          * @param errorBody Response body
          * @param errorMessage Custom error message
          */
-        data class HttpError(
+        data class HttpError<E>(
             val code: Int,
-            val errorBody: String?,
+            val errorBody: E?,
             val errorMessage: String?,
-        ) : Error()
+        ) : Error<E>()
 
         /**
          * Represent SerializationExceptions.
@@ -23,7 +23,7 @@ sealed class ApiResponse<out T> {
          */
         data class SerializationError(
             val message: String?,
-        ) : Error()
+        ) : Error<Nothing>()
 
         /**
          * Represent other exceptions.
@@ -31,6 +31,6 @@ sealed class ApiResponse<out T> {
          */
         data class GenericError(
             val exception: Exception?,
-        ) : Error()
+        ) : Error<Nothing>()
     }
 }

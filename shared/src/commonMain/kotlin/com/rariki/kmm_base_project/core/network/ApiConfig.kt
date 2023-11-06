@@ -30,16 +30,18 @@ object ApiConfig {
     }
 }
 
-suspend inline fun <reified T> HttpClient.safeRequest(
+suspend inline fun <reified T, reified E> HttpClient.safeRequest(
     block: HttpRequestBuilder.() -> Unit,
-): ApiResponse<T> =
+): ApiResponse<T, E> =
     try {
         val response = request { block() }
         ApiResponse.Success(response.body())
     } catch (exception: ClientRequestException) {
+        val response = exception.response
+
         ApiResponse.Error.HttpError(
-            code = exception.response.status.value,
-            errorBody = exception.response.body(),
+            code = response.status.value,
+            errorBody = response.body(),
             errorMessage = exception.message,
         )
     } catch (e: SerializationException) {
