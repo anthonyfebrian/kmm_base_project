@@ -4,6 +4,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.ResponseException
+import io.ktor.client.plugins.ServerResponseException
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.HttpRequestBuilder
@@ -38,13 +39,9 @@ suspend inline fun <reified T, reified E> HttpClient.safeRequest(
         val response = request { block() }
         ApiResponse.Success(response.body())
     } catch (exception: ClientRequestException) {
-        val response = exception.response
-
-        ApiResponse.Error.HttpError(
-            code = response.status.value,
-            errorBody = exception.errorBody(),
-            errorMessage = exception.message,
-        )
+        exception.asApiResponse()
+    } catch (exception: ServerResponseException) {
+        exception.asApiResponse()
     } catch (e: SerializationException) {
         ApiResponse.Error.SerializationError(e.message)
     } catch (e: Exception) {
@@ -57,3 +54,10 @@ suspend inline fun <reified E> ResponseException.errorBody(): E? =
     } catch (e: SerializationException) {
         null
     }
+
+suspend inline fun <reified E> ResponseException.asApiResponse(): ApiResponse<Nothing, E> =
+    ApiResponse.Error.HttpError(
+        code = response.status.value,
+        errorBody = this.errorBody(),
+        errorMessage = this.message,
+    )
