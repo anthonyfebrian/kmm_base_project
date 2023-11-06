@@ -3,16 +3,34 @@ import shared
 
 struct ContentView: View {
     @ObservedObject private(set) var vm: ViewModel = ViewModel()
+    @State var text:String = ""
 
 	var body: some View {
-        if(vm.list.isEmpty) {
-            Text("Empty")
+        VStack {
+            OutlinedTextField(
+                text: $text,
+                prefix: {
+                    Text("+62")
+                },
+                supportingText: {
+                    if(text.isEmpty) {
+                        Text("Dont Empty")
+                    } else {
+                        Text("")
+                    }
+                }
+            )
+            .padding()
+
+            
+            if(self.vm.list.isEmpty) {
+                Text("Empty")
+            }
+            
+            List(vm.list, id:\.self) {
+                Text($0.missionName)
+            }
         }
-        
-        List(vm.list, id:\.self) {
-            Text($0.missionName)
-        }
-        
 	}
 }
 
